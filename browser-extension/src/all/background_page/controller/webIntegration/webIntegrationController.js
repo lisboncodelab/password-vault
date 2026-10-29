@@ -20,6 +20,7 @@ import BuildApiClientOptionsService from "../../service/account/buildApiClientOp
 import GetOrFindActiveSessionService from "../../service/activeSession/getOrFindActiveSessionService";
 import GetOrFindResourcesService from "../../service/resource/getOrFindResourcesService";
 import GetOrFindOfflineResourcesService from "../../service/resource/getOrFindOfflineResourcesService";
+import NeverSaveSitesService from "../../service/lisboncodelab/neverSaveSitesService";
 
 /**
  * Controller related to the in-form call-to-action
@@ -39,6 +40,9 @@ class WebIntegrationController {
    * @return {Promise<void>}
    */
   async autosave(resourceToSave) {
+    if (await NeverSaveSitesService.isNeverSaveSite(resourceToSave.url)) {
+      return;
+    }
     if (await this.isAlreadySaved(resourceToSave)) {
       return;
     }

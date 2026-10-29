@@ -6,70 +6,19 @@
  * For full copyright and license information, please see the LICENSE.txt
  * Redistributions of files must retain the above copyright notice.
  *
- * The popup in the Night look: the dark theme's palette set to Lisbon Code Lab's
- * colours, then the header, search, list and footer of the vault.
+ * The popup in the Night look: the header, search, list and footer of the vault.
  *
  * @copyright     Copyright (c) 2026 Lisbon Code Lab
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  */
 
-@font-face { font-family: "Instrument Sans"; font-weight: 400; font-display: swap; src: url("fonts/instrument-sans-latin-400-normal.woff2") format("woff2"); }
-@font-face { font-family: "Instrument Sans"; font-weight: 500; font-display: swap; src: url("fonts/instrument-sans-latin-500-normal.woff2") format("woff2"); }
-@font-face { font-family: "Instrument Sans"; font-weight: 600; font-display: swap; src: url("fonts/instrument-sans-latin-600-normal.woff2") format("woff2"); }
-@font-face { font-family: "Instrument Sans"; font-weight: 700; font-display: swap; src: url("fonts/instrument-sans-latin-700-normal.woff2") format("woff2"); }
-
-:root {
-    --vault-ink: #1b1b1d;
-    --vault-surface: #232326;
-    --vault-hover: #29292c;
-    --vault-border: #313134;
-    --vault-text: #f2f2ef;
-    --vault-muted: #9d9c96;
-    --vault-yellow: #fff669;
-    --vault-font: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
-
-    --Palette-Gradient-1: #111112;
-    --Palette-Gradient-2: #161618;
-    --Palette-Gradient-3: #1b1b1d;
-    --Palette-Gradient-4: #232326;
-    --Palette-Gradient-5: #313134;
-    --Palette-Gradient-6: #4a4a4e;
-    --Palette-Gradient-7: #6f6e69;
-    --Palette-Gradient-8: #9d9c96;
-    --Palette-Gradient-9: #f2f2ef;
-    --Palette-Contrast-1: #fff669;
-    --Palette-Select: #3b3922;
-    --Palette-Select-highlight-1: #2f2e1c;
-    --Palette-Select-highlight-2: #26251a;
-    --Primary-button-Primary-button-text: #1b1b1d;
-}
+@import url("night.css");
 
 html body {
     width: 360px;
     background: var(--vault-ink);
     color: var(--vault-text);
-    font-family: var(--vault-font);
 }
-
-body input,
-body button,
-body select,
-body textarea {
-    font-family: var(--vault-font);
-}
-
-.vault-icon {
-    width: 16px;
-    height: 16px;
-    flex: none;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 1.8;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-}
-
-.vault-icon.vault-icon-small { width: 11px; height: 11px; }
 
 .vault-icon-button {
     display: grid;
@@ -110,7 +59,6 @@ html body .quickaccess-header.vault-head {
     text-decoration: none;
 }
 
-.vault-smiley { display: block; width: 22px; height: 22px; }
 .vault-head-title { font-size: 15px; font-weight: 600; }
 
 .vault-avatar {
@@ -207,18 +155,6 @@ html body .vault-search input {
     text-decoration: none;
 }
 
-.vault-tile {
-    display: grid;
-    flex: none;
-    place-items: center;
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    color: #fff;
-    font-size: 14px;
-    font-weight: 700;
-}
-
 .vault-item-text { display: flex; flex: 1; flex-direction: column; min-width: 0; }
 .vault-item-name { overflow: hidden; font-size: 13px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
 .vault-item-detail { overflow: hidden; color: var(--vault-muted); font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
@@ -270,3 +206,73 @@ html body .vault-search input {
 }
 
 .vault-button-primary:hover { background: #fff27a; color: var(--vault-ink); }
+
+/* The save card ------------------------------------------------------------- */
+
+body:has(.vault-save) .vault-head { display: none; }
+
+html body .vault-save { padding: 14px; background: var(--vault-ink); color: var(--vault-text); }
+
+.vault-save-head { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+html body .vault-save-title { flex: 1; margin: 0; color: var(--vault-text); font-size: 14px; font-weight: 600; }
+
+html body .vault-save .resource-auto-save-form,
+html body .vault-save .form-container { padding: 0; border: 0; background: transparent; }
+
+html body .vault-save .input { margin: 0 0 8px; padding: 0; }
+
+html body .vault-save label {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--vault-muted);
+    font-size: 11px;
+    font-weight: 600;
+}
+
+html body .vault-save input[type="text"],
+html body .vault-save input[type="password"] {
+    width: 100%;
+    height: 34px;
+    padding: 0 10px;
+    border: 1px solid #3a3a3d;
+    border-radius: 8px;
+    background: var(--vault-surface);
+    color: var(--vault-text);
+    font-size: 13px;
+    box-shadow: none;
+}
+
+html body .vault-save input:focus { border-color: #57564f; outline: none; }
+html body .vault-save .error-message { margin-top: 4px; color: #ff8a80; font-size: 12px; }
+
+.vault-save-actions { display: flex; align-items: center; gap: 8px; margin-top: 14px; }
+
+.vault-save-never {
+    margin-right: auto;
+    color: var(--vault-muted);
+    font-size: 12px;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    cursor: pointer;
+}
+
+.vault-save-never:hover { color: var(--vault-text); }
+
+.vault-save-actions .vault-button-primary { flex: none; height: 34px; padding: 0 14px; border: 0; border-radius: 8px; cursor: pointer; }
+.vault-save-actions .vault-button-primary:disabled { opacity: 0.6; cursor: default; }
+.vault-save-actions .vault-button-primary svg { width: 14px; height: 14px; }
+
+.vault-button-ghost {
+    height: 34px;
+    padding: 0 14px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--vault-text);
+    font-size: 13px;
+    font-weight: 600;
+    box-shadow: inset 0 0 0 1px #3a3a3d;
+    cursor: pointer;
+}
+
+.vault-button-ghost:hover { background: var(--vault-hover); }

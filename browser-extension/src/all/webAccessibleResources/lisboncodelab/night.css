@@ -1,0 +1,79 @@
+/**
+ * Lisbon Code Lab - Password Vault, based on Passbolt
+ * Copyright (c) 2026 Lisbon Code Lab
+ *
+ * Licensed under GNU Affero General Public License version 3 of the or any later version.
+ * For full copyright and license information, please see the LICENSE.txt
+ * Redistributions of files must retain the above copyright notice.
+ *
+ * The Night look shared by every page of the vault: the bundled font, the
+ * colour tokens, and the dark theme's palette set to Lisbon Code Lab's colours.
+ *
+ * @copyright     Copyright (c) 2026 Lisbon Code Lab
+ * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
+ */
+
+@font-face { font-family: "Instrument Sans"; font-weight: 400; font-display: swap; src: url("fonts/instrument-sans-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Instrument Sans"; font-weight: 500; font-display: swap; src: url("fonts/instrument-sans-latin-500-normal.woff2") format("woff2"); }
+@font-face { font-family: "Instrument Sans"; font-weight: 600; font-display: swap; src: url("fonts/instrument-sans-latin-600-normal.woff2") format("woff2"); }
+@font-face { font-family: "Instrument Sans"; font-weight: 700; font-display: swap; src: url("fonts/instrument-sans-latin-700-normal.woff2") format("woff2"); }
+
+:root {
+    --vault-ink: #1b1b1d;
+    --vault-surface: #232326;
+    --vault-hover: #29292c;
+    --vault-border: #313134;
+    --vault-text: #f2f2ef;
+    --vault-muted: #9d9c96;
+    --vault-yellow: #fff669;
+    --vault-font: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+    --Palette-Gradient-1: #111112;
+    --Palette-Gradient-2: #161618;
+    --Palette-Gradient-3: #1b1b1d;
+    --Palette-Gradient-4: #232326;
+    --Palette-Gradient-5: #313134;
+    --Palette-Gradient-6: #4a4a4e;
+    --Palette-Gradient-7: #6f6e69;
+    --Palette-Gradient-8: #9d9c96;
+    --Palette-Gradient-9: #f2f2ef;
+    --Palette-Contrast-1: #fff669;
+    --Palette-Select: #3b3922;
+    --Palette-Select-highlight-1: #2f2e1c;
+    --Palette-Select-highlight-2: #26251a;
+    --Primary-button-Primary-button-text: #1b1b1d;
+}
+
+html body,
+body input,
+body button,
+body select,
+body textarea {
+    font-family: var(--vault-font);
+}
+
+.vault-icon {
+    width: 16px;
+    height: 16px;
+    flex: none;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.vault-icon.vault-icon-small { width: 11px; height: 11px; }
+.vault-smiley { display: block; width: 22px; height: 22px; }
+
+.vault-tile {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+}

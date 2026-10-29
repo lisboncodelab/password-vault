@@ -1,0 +1,90 @@
+/**
+ * Lisbon Code Lab - Password Vault, based on Passbolt
+ * Copyright (c) 2026 Lisbon Code Lab
+ *
+ * Licensed under GNU Affero General Public License version 3 of the or any later version.
+ * For full copyright and license information, please see the LICENSE.txt
+ * Redistributions of files must retain the above copyright notice.
+ *
+ * The menu under a login field in the Night look: the vault's logins, a divider, then the actions.
+ *
+ * @copyright     Copyright (c) 2026 Lisbon Code Lab
+ * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
+ */
+
+@import url("night.css");
+
+html body .web-integration .in-form-menu {
+    padding: 6px;
+    border: 0;
+    border-radius: 12px;
+    background: var(--vault-ink);
+    color: var(--vault-text);
+    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.4), 0 2px 6px rgba(0, 0, 0, 0.25);
+}
+
+html body .web-integration .in-form-menu--scrollable { height: auto; max-height: 200px; }
+
+.vault-menu-head {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 8px 8px;
+    color: var(--vault-muted);
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.vault-menu-head .vault-smiley { width: 16px; height: 16px; }
+
+html body .web-integration .in-form-menu-item,
+html body .web-integration .in-form-menu-item:first-child,
+html body .web-integration .in-form-menu-item:last-child {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 8px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--vault-text);
+    cursor: pointer;
+}
+
+html body .web-integration .in-form-menu-item:hover,
+html body .web-integration .in-form-menu-item:active {
+    background: var(--vault-hover);
+    box-shadow: none;
+}
+
+html body .web-integration .in-form-menu-item.is-resource + .in-form-menu-item.is-action { margin-top: 11px; }
+
+html body .web-integration .in-form-menu-item.is-resource + .in-form-menu-item.is-action::before {
+    content: "";
+    position: absolute;
+    top: -6px;
+    left: 8px;
+    right: 8px;
+    height: 1px;
+    background: var(--vault-border);
+}
+
+html body .web-integration .in-form-menu-item-icon {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    color: var(--vault-muted);
+}
+
+html body .web-integration .in-form-menu-item-icon svg.vault-icon { width: 16px; height: 16px; }
+html body .web-integration .in-form-menu-item-icon .vault-tile { width: 28px; height: 28px; border-radius: 7px; font-size: 12px; }
+
+html body .web-integration .in-form-menu-item-content-header strong { color: var(--vault-text); font-size: 13px; font-weight: 600; }
+
+html body .web-integration .in-form-menu-item-content-subheader,
+html body .web-integration .in-form-menu-item-content-description { color: var(--vault-muted); font-size: 12px; }
+
+html body .web-integration .in-form-menu-item.disabled { opacity: 0.5; cursor: default; }
