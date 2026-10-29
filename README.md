@@ -1,3 +1,12 @@
+<p align="center">
+  <a href="https://lisboncodelab.com">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="docs/lisboncodelab-logo-white.png">
+      <img src="docs/lisboncodelab-logo.png" alt="Lisbon Code Lab" width="360">
+    </picture>
+  </a>
+</p>
+
 # Password Vault by Lisbon Code Lab
 
 **An alternative browser extension for Passbolt servers.** Same server, same end-to-end encryption, an extension that is quicker to use day to day.
