@@ -1,5 +1,6 @@
 {
   "manifest_version": 3,
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuzk1wdnuifVpjBt/K+uuznb5vH5af/FrZ7gSfhwJEOOaipAKcn5kU23OqU2B9OXwjOCVkeAdVbK7Em0DiUcaWMALRx3u5iO0kJ5mOLbuDiw6dGqYb0Oco+lHjcBXX5ZMiFVhosTuk/unR9ukP77zTp97usphLQ0nT2NIHvXQjQC84WzrJ7G+rJpc/8/ODBT385Dh9rAHZvGyJLid6ccWrCoiqy9b/g95bBTeZVJezol048JHh+qVhgOd+dT7CKFVE8dCEJydY8rjHCV4N9JtwIAs1i7QmNmgKvtr77lScSnRMf9KEFVbWQrx9w+IH1B9ApqqCSNwR2Gvnm2fiAcIRQIDAQAB",
   "name": "__MSG_appName__",
   "short_name": "Password Vault",
   "version": "5.17.1",
