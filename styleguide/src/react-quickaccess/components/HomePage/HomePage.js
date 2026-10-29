@@ -395,19 +395,24 @@ class HomePage extends React.Component {
   }
 
   /**
+   * The page a new login starts on; only read once the metadata settings are loaded.
+   * @returns {string}
+   */
+  get createPath() {
+    return this.shouldDisplayActionAbortedMissingMetadataKeys ? "action-aborted-missing-metadata-keys" : "create";
+  }
+
+  /**
    * Renders the footer: new login, the password generator and the filters.
    * @returns {JSX.Element}
    */
   renderFooter() {
     const canCreate = this.hasMetadataTypesSettings() && this.canCreatePassword();
-    const createPath = this.shouldDisplayActionAbortedMissingMetadataKeys
-      ? "action-aborted-missing-metadata-keys"
-      : "create";
     return (
       <footer className="vault-foot">
         {canCreate && (
           <Link
-            to={`/webAccessibleResources/quickaccess/resources/${createPath}`}
+            to={`/webAccessibleResources/quickaccess/resources/${this.createPath}`}
             id="popupAction"
             className="vault-button-primary"
             role="button"
