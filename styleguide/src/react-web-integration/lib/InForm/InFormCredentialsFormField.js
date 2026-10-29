@@ -63,6 +63,8 @@ class InFormCredentialsFormField {
    */
   bindCallbacks() {
     this.handleAutoSaveEvent = this.handleAutoSaveEvent.bind(this);
+    this.handlePasswordKeydown = this.handlePasswordKeydown.bind(this);
+    this.handlePseudoFormClick = this.handlePseudoFormClick.bind(this);
     this.autosave = this.autosave.bind(this);
     this.destroy = this.destroy.bind(this);
   }
@@ -73,20 +75,48 @@ class InFormCredentialsFormField {
   handleAutoSaveEvent() {
     this.field.addEventListener("submit", this.autosave);
     this.submitButton?.addEventListener("click", this.autosave);
+    this.passwordField?.addEventListener("keydown", this.handlePasswordKeydown);
+    if (this.isPseudoForm) {
+      this.field.addEventListener("click", this.handlePseudoFormClick);
+    }
+  }
+
+  /**
+   * Proposes the auto-save when the user presses Enter in the password field
+   * @param {KeyboardEvent} event The keydown event
+   */
+  handlePasswordKeydown(event) {
+    if (event.key !== "Enter") {
+      return;
+    }
+    this.autosave();
+  }
+
+  /**
+   * Proposes the auto-save when the user clicks a button of a container that is not a real form
+   * @param {MouseEvent} event The click event
+   */
+  handlePseudoFormClick(event) {
+    const button = event.target?.closest?.("button, [role='button'], input[type='button'], input[type='submit']");
+    if (!button) {
+      return;
+    }
+    this.autosave();
   }
 
   /** Autosave current credentials in the page */
   autosave() {
-    const areFieldsFilled = Boolean(this.usernameField?.value?.trim()) || Boolean(this.passwordField?.value?.trim());
-    if (!this.hasAlreadySubmitted && areFieldsFilled) {
-      this.hasAlreadySubmitted = true;
-      port.emit("passbolt.web-integration.autosave", {
-        name: document.title,
-        username: this.usernameField?.value || "",
-        password: this.passwordField?.value || "",
-        url: document.URL,
-      });
+    const hasPassword = Boolean(this.passwordField?.value?.trim());
+    if (this.hasAlreadySubmitted || !hasPassword) {
+      return;
     }
+    this.hasAlreadySubmitted = true;
+    port.emit("passbolt.web-integration.autosave", {
+      name: document.title,
+      username: this.usernameField?.value || "",
+      password: this.passwordField.value,
+      url: document.URL,
+    });
   }
 
   /** DESTROY */
@@ -97,6 +127,8 @@ class InFormCredentialsFormField {
   destroy() {
     this.field.removeEventListener("submit", this.autosave);
     this.submitButton?.removeEventListener("click", this.autosave);
+    this.passwordField?.removeEventListener("keydown", this.handlePasswordKeydown);
+    this.field.removeEventListener("click", this.handlePseudoFormClick);
   }
 }
 

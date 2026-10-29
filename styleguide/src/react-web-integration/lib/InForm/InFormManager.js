@@ -433,13 +433,18 @@ class InFormManager {
       const [usernameField] = ctasIn("username");
       const [otpField] = ctasIn("otp");
 
-      return new InFormCredentialsFormField(record.containerElement, {
+      const credentialsFormField = new InFormCredentialsFormField(record.containerElement, {
         usernameField,
         passwordField,
         isPseudoForm: record.isPseudoForm,
         otpField,
         confirmPasswordFields,
       });
+      // Propose to save the credentials of every login, not only the ones Passbolt generated
+      if (passwordField) {
+        credentialsFormField.handleAutoSaveEvent();
+      }
+      return credentialsFormField;
     });
 
     // Destroy the instances whose container is gone.
