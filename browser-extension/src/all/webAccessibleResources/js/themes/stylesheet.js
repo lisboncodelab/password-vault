@@ -31,6 +31,12 @@
      * Initialise to get the theme from local storage or OS preference
      */
     async init() {
+      const forcedTheme = document.querySelector("#stylesheet-manager")?.dataset.theme;
+      if (forcedTheme && this.isValidTheme(forcedTheme)) {
+        this.theme = forcedTheme;
+        this.updateStylesWithUserPreferences();
+        return;
+      }
       if (await this.isThemeDefined()) {
         this.theme = await this.getThemeFromLocalStorage();
       } else {

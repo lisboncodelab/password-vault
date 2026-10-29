@@ -1,0 +1,272 @@
+/**
+ * Lisbon Code Lab - Password Vault, based on Passbolt
+ * Copyright (c) 2026 Lisbon Code Lab
+ *
+ * Licensed under GNU Affero General Public License version 3 of the or any later version.
+ * For full copyright and license information, please see the LICENSE.txt
+ * Redistributions of files must retain the above copyright notice.
+ *
+ * The popup in the Night look: the dark theme's palette set to Lisbon Code Lab's
+ * colours, then the header, search, list and footer of the vault.
+ *
+ * @copyright     Copyright (c) 2026 Lisbon Code Lab
+ * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
+ */
+
+@font-face { font-family: "Instrument Sans"; font-weight: 400; font-display: swap; src: url("fonts/instrument-sans-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Instrument Sans"; font-weight: 500; font-display: swap; src: url("fonts/instrument-sans-latin-500-normal.woff2") format("woff2"); }
+@font-face { font-family: "Instrument Sans"; font-weight: 600; font-display: swap; src: url("fonts/instrument-sans-latin-600-normal.woff2") format("woff2"); }
+@font-face { font-family: "Instrument Sans"; font-weight: 700; font-display: swap; src: url("fonts/instrument-sans-latin-700-normal.woff2") format("woff2"); }
+
+:root {
+    --vault-ink: #1b1b1d;
+    --vault-surface: #232326;
+    --vault-hover: #29292c;
+    --vault-border: #313134;
+    --vault-text: #f2f2ef;
+    --vault-muted: #9d9c96;
+    --vault-yellow: #fff669;
+    --vault-font: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+    --Palette-Gradient-1: #111112;
+    --Palette-Gradient-2: #161618;
+    --Palette-Gradient-3: #1b1b1d;
+    --Palette-Gradient-4: #232326;
+    --Palette-Gradient-5: #313134;
+    --Palette-Gradient-6: #4a4a4e;
+    --Palette-Gradient-7: #6f6e69;
+    --Palette-Gradient-8: #9d9c96;
+    --Palette-Gradient-9: #f2f2ef;
+    --Palette-Contrast-1: #fff669;
+    --Palette-Select: #3b3922;
+    --Palette-Select-highlight-1: #2f2e1c;
+    --Palette-Select-highlight-2: #26251a;
+    --Primary-button-Primary-button-text: #1b1b1d;
+}
+
+html body {
+    width: 360px;
+    background: var(--vault-ink);
+    color: var(--vault-text);
+    font-family: var(--vault-font);
+}
+
+body input,
+body button,
+body select,
+body textarea {
+    font-family: var(--vault-font);
+}
+
+.vault-icon {
+    width: 16px;
+    height: 16px;
+    flex: none;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.vault-icon.vault-icon-small { width: 11px; height: 11px; }
+
+.vault-icon-button {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--vault-muted);
+    cursor: pointer;
+}
+
+.vault-icon-button:hover,
+.vault-icon-button:focus-visible { background: var(--vault-hover); color: var(--vault-text); outline: none; }
+.vault-icon-button.is-copied { color: var(--vault-yellow); }
+
+/* The header ---------------------------------------------------------------- */
+
+html body .quickaccess-header.vault-head {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    height: auto;
+    padding: 14px 16px 12px;
+    border: 0;
+    background: var(--vault-ink);
+}
+
+.vault-head-brand {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    gap: 9px;
+    color: var(--vault-text);
+    text-decoration: none;
+}
+
+.vault-smiley { display: block; width: 22px; height: 22px; }
+.vault-head-title { font-size: 15px; font-weight: 600; }
+
+.vault-avatar {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    margin-left: 2px;
+    border-radius: 50%;
+    background: var(--vault-yellow);
+    color: var(--vault-ink);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+/* The search ---------------------------------------------------------------- */
+
+.vault-search {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 38px;
+    margin: 0 16px 4px;
+    padding: 0 6px 0 12px;
+    border: 1px solid #333336;
+    border-radius: 10px;
+    background: var(--vault-surface);
+    color: var(--vault-muted);
+}
+
+.vault-search:focus-within { border-color: #57564f; }
+
+html body .vault-search input {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--vault-text);
+    font-size: 13px;
+    outline: none;
+    box-shadow: none;
+}
+
+.vault-search input::placeholder { color: var(--vault-muted); }
+.vault-search input::-webkit-search-cancel-button { display: none; }
+
+.vault-search kbd {
+    margin-right: 6px;
+    padding: 1px 6px;
+    border-radius: 5px;
+    background: var(--vault-border);
+    color: #c9c8c3;
+    font: 600 11px var(--vault-font);
+}
+
+/* The list ------------------------------------------------------------------ */
+
+.vault-home { display: flex; flex-direction: column; height: 482px; }
+.vault-list { flex: 1; overflow-y: auto; padding: 4px 8px; }
+
+.vault-section-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+    padding: 12px 8px 6px;
+    color: var(--vault-muted);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.vault-section-count { margin-left: auto; font-weight: 500; letter-spacing: 0; text-transform: none; }
+.vault-site-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--vault-yellow); }
+.vault-empty { margin: 0; padding: 6px 8px 10px; color: var(--vault-muted); font-size: 12px; }
+
+.vault-items { margin: 0; padding: 0; list-style: none; }
+
+.vault-item { display: flex; align-items: center; gap: 4px; padding: 0 4px 0 0; border-radius: 9px; }
+.vault-item:hover,
+.vault-item:focus-within { background: var(--vault-hover); }
+
+.vault-item-main {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    padding: 7px 8px;
+    color: var(--vault-text);
+    text-decoration: none;
+}
+
+.vault-tile {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.vault-item-text { display: flex; flex: 1; flex-direction: column; min-width: 0; }
+.vault-item-name { overflow: hidden; font-size: 13px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+.vault-item-detail { overflow: hidden; color: var(--vault-muted); font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+
+.vault-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    margin-left: 6px;
+    padding: 1px 6px;
+    border-radius: 999px;
+    background: var(--vault-border);
+    color: #e6e5e0;
+    font-size: 10.5px;
+    font-weight: 600;
+    vertical-align: 1px;
+}
+
+.vault-item-actions { display: none; gap: 2px; }
+.vault-item:hover .vault-item-actions,
+.vault-item:focus-within .vault-item-actions { display: flex; }
+
+.vault-loading { display: grid; justify-items: center; gap: 8px; padding: 40px 0; color: var(--vault-muted); font-size: 12px; }
+.vault-error { margin: 0 16px 8px; color: #ff8a80; font-size: 12px; }
+
+/* The footer ---------------------------------------------------------------- */
+
+.vault-foot {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 12px 16px;
+    border-top: 1px solid #2c2c2f;
+}
+
+.vault-button-primary {
+    display: inline-flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: 38px;
+    border-radius: 10px;
+    background: var(--vault-yellow);
+    color: var(--vault-ink);
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.vault-button-primary:hover { background: #fff27a; color: var(--vault-ink); }

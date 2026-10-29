@@ -66,6 +66,10 @@ const buildSharedExtraPlugins = () => [
         context: resolveSrc('./src/all/webAccessibleResources'),
         to: resolveSrc('./build/all/webAccessibleResources'),
       },
+      {
+        from: resolveSrc('./src/all/webAccessibleResources/lisboncodelab'),
+        to: resolveSrc('./build/all/webAccessibleResources/lisboncodelab'),
+      },
       // Styleguide assets
       { from: 'group_default.png', context: styleguidePath('src/img/avatar'), to: warBuildPath('img/avatar') },
       { from: 'check_tick.svg', context: styleguidePath('src/img/controls'), to: warBuildPath('img/controls') },
