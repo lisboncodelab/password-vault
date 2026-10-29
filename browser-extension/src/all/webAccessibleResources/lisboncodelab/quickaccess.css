@@ -56,6 +56,43 @@ html body .quickaccess .vault-icon-button:focus-visible {
 html body .quickaccess .vault-icon-button.is-copied { color: var(--vault-yellow); }
 html body .quickaccess .vault-icon-button::after { display: none; }
 
+/* Tooltips (lisboncodelab/tooltips.js) -------------------------------------- */
+
+html body .vault-tooltip {
+    position: fixed;
+    z-index: 10000;
+    max-width: 240px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    background: var(--vault-text);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+    color: var(--vault-ink);
+    font: 600 11px/1.35 var(--vault-font);
+    pointer-events: none;
+}
+
+html body .vault-tooltip[hidden] { display: none; }
+
+/* Resource icons (Passbolt's ResourceIcon) ---------------------------------- */
+
+html body .quickaccess .vault-resource-icon { display: flex; flex: none; }
+
+html body .quickaccess .vault-resource-icon .teaser-image {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: var(--Resource-icon-Resource-icons-backgound);
+    --icon-color: var(--Resource-icon-Resource-icon-color);
+}
+
+html body .quickaccess .vault-resource-icon .teaser-image svg { width: 20px; height: 20px; }
+html body .quickaccess .vault-resource-icon .teaser-image.clear-stroke svg { --icon-color: var(--Text-and-icons-clear-color); }
+html body .quickaccess .vault-resource-icon .teaser-image.dark-stroke svg { --icon-color: var(--Text-and-icons-dark-color); }
+html body .quickaccess .vault-resource-icon .teaser-image.transparent svg { --icon-color: var(--Text-and-icons-Main-text); }
+
 /* The header ---------------------------------------------------------------- */
 
 html body .quickaccess .quickaccess-header.vault-head {

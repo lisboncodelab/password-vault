@@ -74,15 +74,3 @@ body textarea {
 
 .vault-icon.vault-icon-small { width: 11px; height: 11px; }
 .vault-smiley { display: block; width: 22px; height: 22px; }
-
-.vault-tile {
-    display: grid;
-    flex: none;
-    place-items: center;
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    color: #fff;
-    font-size: 14px;
-    font-weight: 700;
-}

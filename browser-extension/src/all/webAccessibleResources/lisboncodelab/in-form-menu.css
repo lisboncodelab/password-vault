@@ -80,7 +80,8 @@ html body .web-integration .in-form-menu-item-icon {
 }
 
 html body .web-integration .in-form-menu-item-icon svg.vault-icon { width: 16px; height: 16px; }
-html body .web-integration .in-form-menu-item-icon .vault-tile { width: 28px; height: 28px; border-radius: 7px; font-size: 12px; }
+html body .web-integration .in-form-menu-item-icon .teaser-image { width: 28px; height: 28px; border-radius: 7px; }
+html body .web-integration .in-form-menu-item-icon .teaser-image svg { width: 18px; height: 18px; }
 
 html body .web-integration .in-form-menu-item-content-header strong { color: var(--vault-text); font-size: 13px; font-weight: 600; }
 
