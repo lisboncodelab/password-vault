@@ -4,7 +4,7 @@
     "description": "The application name of the extension, displayed in the web store. 45 characters max."
   },
   "appDescription": {
-    "message": "The Lisbon Code Lab team's password vault.",
+    "message": "Alternative browser extension for Passbolt servers that offers to save every login.",
     "description": "The description of the extension, displayed in the web store. 85 characters max."
   }
 }
