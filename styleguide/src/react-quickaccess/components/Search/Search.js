@@ -2,8 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import { withTranslation, Trans } from "react-i18next";
 import { withAppContext } from "../../../shared/context/AppContext/AppContext";
-import SearchSVG from "../../../img/svg/search.svg";
-import CloseSVG from "../../../img/svg/close.svg";
+import { CloseIcon, SearchIcon } from "../Vault/VaultIcons";
 
 class Search extends React.Component {
   constructor(props) {
@@ -65,36 +64,31 @@ class Search extends React.Component {
 
   render() {
     return (
-      <div className="search-wrapper">
-        <div className="input search required">
-          <label className="visually-hidden">
-            <Trans>Search</Trans>
-          </label>
-          <input
-            name="search"
-            maxLength="50"
-            type="search"
-            placeholder={this.translate("Search")}
-            autoComplete="off"
-            ref={this.searchInputRef}
-            onChange={this.handleInputChange}
-            value={this.props.context.search}
-          />
-          <div className="search-button-wrapper">
-            {this.props.context.search ? (
-              <button className="button button-transparent" name="clear-button" onClick={this.clearSearchInput}>
-                <CloseSVG />
-                <span className="visuallyhidden">
-                  <Trans>Clear</Trans>
-                </span>
-              </button>
-            ) : (
-              <div className="search-icon">
-                <SearchSVG />
-              </div>
-            )}
-          </div>
-        </div>
+      <div className="vault-search">
+        <SearchIcon />
+        <label className="visually-hidden">
+          <Trans>Search</Trans>
+        </label>
+        <input
+          name="search"
+          maxLength="50"
+          type="search"
+          placeholder={this.translate("Search the vault")}
+          autoComplete="off"
+          ref={this.searchInputRef}
+          onChange={this.handleInputChange}
+          value={this.props.context.search}
+        />
+        {this.props.context.search ? (
+          <button type="button" className="vault-icon-button" name="clear-button" onClick={this.clearSearchInput}>
+            <CloseIcon />
+            <span className="visually-hidden">
+              <Trans>Clear</Trans>
+            </span>
+          </button>
+        ) : (
+          <kbd>/</kbd>
+        )}
       </div>
     );
   }

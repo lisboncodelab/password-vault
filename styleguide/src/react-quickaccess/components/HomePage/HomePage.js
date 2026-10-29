@@ -17,8 +17,6 @@ import { Link, withRouter } from "react-router-dom";
 import PropTypes from "prop-types";
 import { Trans, withTranslation } from "react-i18next";
 import SpinnerSVG from "../../../img/svg/spinner.svg";
-import { withRbac } from "../../../shared/context/Rbac/RbacContext";
-import { uiActions } from "../../../shared/services/rbacs/uiActionEnumeration";
 import { withAppContext } from "../../../shared/context/AppContext/AppContext";
 import { filterResourcesBySearch, filterResourcesSupportedByQuickAccess } from "../../../shared/utils/filterUtils";
 import { withResourcesLocalStorage } from "../../contexts/ResourceLocalStorageContext";
@@ -31,20 +29,22 @@ import {
   RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG,
   RESOURCE_TYPE_V5_DEFAULT_SLUG,
 } from "../../../shared/models/entity/resourceType/resourceTypeSchemasDefinition";
-import DisplayResourceUrisBadge from "../../../react-extension/components/Resource/DisplayResourceUrisBadge/DisplayResourceUrisBadge";
 import CanSuggestService from "../../../shared/services/canSuggestService/canSuggestService";
-import CaretRightSVG from "../../../img/svg/caret_right.svg";
-import FilterSVG from "../../../img/svg/filter.svg";
-import UsersSVG from "../../../img/svg/users.svg";
-import TagV2SVG from "../../../img/svg/tag_v2.svg";
 import MetadataKeysSettingsEntity from "../../../shared/models/entity/metadata/metadataKeysSettingsEntity";
 import { withMetadataKeysSettingsLocalStorage } from "../../../shared/context/MetadataKeysSettingsLocalStorageContext/MetadataKeysSettingsLocalStorageContext";
 import { sortResourcesByUriMatchingScore } from "../../../shared/utils/sortUtils";
 import { withActiveSessionLocalStorage } from "../../../shared/context/ActiveSession/ActiveSessionLocalStorageContext";
 import UserActiveSessionEntity from "../../../shared/models/entity/session/userActiveSessionEntity";
+import ClipboardServiceWorkerService from "../../../shared/services/serviceWorker/clipboard/clipboardServiceWorkerService";
+import SecretServiceWorkerService from "../../../shared/services/serviceWorker/secret/secretServiceWorkerService";
+import VaultResourceRow from "./VaultResourceRow";
+import { KeyIcon, PlusIcon, SlidersIcon } from "../Vault/VaultIcons";
+import { hostOf } from "../../lib/vaultTile";
 
 const SUGGESTED_RESOURCES_LIMIT = 20;
 const BROWSED_RESOURCES_LIMIT = 100;
+const ALL_RESOURCES_LIMIT = 100;
+const COPIED_FEEDBACK_DELAY = 1500;
 
 class HomePage extends React.Component {
   /**
@@ -61,6 +61,8 @@ class HomePage extends React.Component {
   constructor(props) {
     super(props);
     this.state = this.defaultState;
+    this.clipboardServiceWorkerService = new ClipboardServiceWorkerService(props.context.port);
+    this.secretServiceWorkerService = new SecretServiceWorkerService(props.context.port, props.activeSession);
     this.initEventHandlers();
   }
 
@@ -72,6 +74,7 @@ class HomePage extends React.Component {
     return {
       activeTabUrl: null,
       usingOnThisTab: false,
+      copied: null, // The field just copied, as {resourceId, field}
     };
   }
 
@@ -80,11 +83,7 @@ class HomePage extends React.Component {
    * Invoked immediately after component is inserted into the tree
    */
   componentDidMount() {
-    /*
-     * Given the specific nature of QuickA's usage—focused on quickly consuming and creating passwords rather
-     * than ongoing resource management — The local storage should be updated only the first time the application
-     * is open.
-     */
+    // The local storage is updated only the first time the application is open.
     if (!HomePage.isInitialised && this.props.activeSession.isSessionOnline) {
       this.props.resourcesLocalStorageContext.updateLocalStorage();
       HomePage.isInitialised = true;
@@ -98,10 +97,19 @@ class HomePage extends React.Component {
   }
 
   /**
+   * ComponentWillUnmount hook.
+   */
+  componentWillUnmount() {
+    clearTimeout(this.copiedTimeout);
+  }
+
+  /**
    * Initialize the component event handlers
    */
   initEventHandlers() {
     this.handleUseOnThisTabClick = this.handleUseOnThisTabClick.bind(this);
+    this.handleCopyUsername = this.handleCopyUsername.bind(this);
+    this.handleCopyPassword = this.handleCopyPassword.bind(this);
   }
 
   /**
@@ -160,6 +168,17 @@ class HomePage extends React.Component {
   });
 
   /**
+   * Sorts the resources by name for the "All items" section.
+   * @param {Array} resources The resources
+   * @returns {Array<Object>} A sorted copy
+   */
+  sortResourcesByName = memoize((resources) =>
+    [...resources].sort((first, second) =>
+      (first.metadata.name || "").localeCompare(second.metadata.name || "", undefined, { sensitivity: "base" }),
+    ),
+  );
+
+  /**
    * Handles the click event of the button "Use on this tab".
    * @returns {Promise<void>}
    */
@@ -185,6 +204,49 @@ class HomePage extends React.Component {
         });
       }
     }
+  }
+
+  /**
+   * Copies a resource's username.
+   * @param {object} resource The resource
+   * @returns {Promise<void>}
+   */
+  async handleCopyUsername(resource) {
+    await this.clipboardServiceWorkerService.copy(resource.metadata.username);
+    this.showCopied(resource.id, "username");
+  }
+
+  /**
+   * Decrypts a resource's password and copies it until the clipboard is flushed.
+   * @param {object} resource The resource
+   * @returns {Promise<void>}
+   */
+  async handleCopyPassword(resource) {
+    let plaintextSecretDto;
+    try {
+      plaintextSecretDto = await this.secretServiceWorkerService.findByResourceId(resource.id);
+    } catch (error) {
+      if (error?.name !== "UserAbortsOperationError") {
+        console.error(error);
+      }
+      return;
+    }
+    if (!plaintextSecretDto?.password?.length) {
+      return;
+    }
+    await this.clipboardServiceWorkerService.copyTemporarily(plaintextSecretDto.password);
+    this.showCopied(resource.id, "password");
+  }
+
+  /**
+   * Marks a field as copied for a moment.
+   * @param {string} resourceId The resource id
+   * @param {string} field "username" or "password"
+   */
+  showCopied(resourceId, field) {
+    clearTimeout(this.copiedTimeout);
+    this.setState({ copied: { resourceId, field } });
+    this.copiedTimeout = setTimeout(() => this.setState({ copied: null }), COPIED_FEEDBACK_DELAY);
   }
 
   /**
@@ -242,193 +304,151 @@ class HomePage extends React.Component {
   }
 
   /**
+   * Renders the rows of a list of resources.
+   * @param {Array<Object>} resources The resources
+   * @param {boolean} canFill Whether the rows offer to fill the current tab
+   * @returns {JSX.Element[]}
+   */
+  renderRows(resources, canFill) {
+    return resources.map((resource) => (
+      <VaultResourceRow
+        key={resource.id}
+        resource={resource}
+        copiedField={this.state.copied?.resourceId === resource.id ? this.state.copied.field : null}
+        onFill={canFill ? this.handleUseOnThisTabClick : null}
+        onCopyUsername={this.handleCopyUsername}
+        onCopyPassword={this.handleCopyPassword}
+      />
+    ));
+  }
+
+  /**
+   * Renders a titled section of resources, or its empty text.
+   * @param {object} section The section: title, count, marker, resources, canFill and emptyText
+   * @returns {JSX.Element}
+   */
+  renderSection({ title, count, hasSiteMarker = false, resources, canFill = false, emptyText }) {
+    return (
+      <section className="vault-section">
+        <h2 className="vault-section-label">
+          {hasSiteMarker && <i className="vault-site-dot" />}
+          {title}
+          <span className="vault-section-count">{count}</span>
+        </h2>
+        {resources.length === 0 && <p className="vault-empty">{emptyText}</p>}
+        {resources.length > 0 && <ul className="vault-items">{this.renderRows(resources, canFill)}</ul>}
+      </section>
+    );
+  }
+
+  /**
+   * Renders the loading state of the list.
+   * @returns {JSX.Element}
+   */
+  renderLoading() {
+    return (
+      <div className="vault-loading">
+        <SpinnerSVG />
+        <p>
+          <Trans>Retrieving your passwords</Trans>
+        </p>
+      </div>
+    );
+  }
+
+  /**
+   * Renders the list sections: the search results, or this site's logins then every login.
+   * @param {Array<Object>} resources The resources the quick access can list
+   * @returns {JSX.Element}
+   */
+  renderSections(resources) {
+    const t = this.props.t;
+    const search = this.props.context.search;
+    if (search?.length > 0) {
+      const results = this.filterSearchedResources(resources, search);
+      return this.renderSection({
+        title: t("Results"),
+        count: results.length,
+        resources: results,
+        emptyText: t("No result match your search. Try with another search term."),
+      });
+    }
+    const suggestedResources = this.filterSuggestedResources(resources, this.state.activeTabUrl);
+    return (
+      <>
+        {this.renderSection({
+          title: t("On this site"),
+          count: hostOf(this.state.activeTabUrl),
+          hasSiteMarker: true,
+          resources: suggestedResources,
+          canFill: true,
+          emptyText: t("No logins for this site yet."),
+        })}
+        {this.renderSection({
+          title: t("All items"),
+          count: resources.length,
+          resources: this.sortResourcesByName(resources).slice(0, ALL_RESOURCES_LIMIT),
+          emptyText: t("Your vault is empty."),
+        })}
+      </>
+    );
+  }
+
+  /**
+   * Renders the footer: new login, the password generator and the filters.
+   * @returns {JSX.Element}
+   */
+  renderFooter() {
+    const canCreate = this.hasMetadataTypesSettings() && this.canCreatePassword();
+    const createPath = this.shouldDisplayActionAbortedMissingMetadataKeys
+      ? "action-aborted-missing-metadata-keys"
+      : "create";
+    return (
+      <footer className="vault-foot">
+        {canCreate && (
+          <Link
+            to={`/webAccessibleResources/quickaccess/resources/${createPath}`}
+            id="popupAction"
+            className="vault-button-primary"
+            role="button"
+          >
+            <PlusIcon />
+            <Trans>New login</Trans>
+          </Link>
+        )}
+        <Link
+          to="/webAccessibleResources/quickaccess/resources/generate-password"
+          className="vault-icon-button"
+          title={this.props.t("Password generator")}
+        >
+          <KeyIcon />
+        </Link>
+        <Link
+          to="/webAccessibleResources/quickaccess/more-filters"
+          className="vault-icon-button"
+          title={this.props.t("Filters")}
+        >
+          <SlidersIcon />
+        </Link>
+      </footer>
+    );
+  }
+
+  /**
    * Component renderer.
    * @returns {JSX}
    */
   render() {
     const isReady = this.props.resources !== null && this.props.resourceTypes != null;
-    const hasSearch = this.props.context.search?.length > 0;
-    const showSuggestedSection = !hasSearch;
-    const showBrowsedResourcesSection = hasSearch;
-    const showFiltersSection = !hasSearch;
-    const canUseTag =
-      this.props.context.siteSettings.canIUse("tags") && this.props.rbacContext.canIUseAction(uiActions.TAGS_USE);
-    // The groups are retrieved from the API, the filter is not offered while in an offline session.
-    const isSessionOnline = Boolean(this.props.activeSession?.isSessionOnline);
-    let browsedResources, suggestedResources;
-
-    if (isReady) {
-      const resources = this.resourcesSupportedByQuickAccess;
-      browsedResources = this.filterSearchedResources(resources, this.props.context.search);
-      suggestedResources = this.filterSuggestedResources(resources, this.state.activeTabUrl);
-    }
 
     return (
-      <div className="index-list">
-        <div className="list-container">
-          {showSuggestedSection && (
-            <div className={`list-section`}>
-              <div className="list-title">
-                <h2>
-                  <Trans>Suggested</Trans>
-                </h2>
-              </div>
-              <ul className="list-items">
-                {!isReady && (
-                  <li className="empty-entry">
-                    <SpinnerSVG />
-                    <p className="processing-text">
-                      <Trans>Retrieving your passwords</Trans>
-                    </p>
-                  </li>
-                )}
-                {isReady && suggestedResources.length === 0 && (
-                  <li className="empty-entry">
-                    <p>
-                      <Trans>No passwords found for the current page. You can use the search.</Trans>
-                    </p>
-                  </li>
-                )}
-                {isReady &&
-                  suggestedResources.length > 0 &&
-                  suggestedResources.map((resource) => (
-                    <li className="suggested-resource-entry" key={resource.id}>
-                      <button
-                        type="button"
-                        className="resource-details link"
-                        onClick={() => this.handleUseOnThisTabClick(resource)}
-                      >
-                        <div className="inline-resource-name">
-                          <span className="title">{resource.metadata.name}</span>
-                          <span className="username">
-                            {resource.metadata.username ? ` (${resource.metadata.username})` : ""}
-                          </span>
-                        </div>
-                        <div className="uris">
-                          <span className="url">{resource.metadata.uris?.[0]}</span>
-                          {resource.metadata.uris?.length > 1 && (
-                            <DisplayResourceUrisBadge additionalUris={resource.metadata.uris?.slice(1)} />
-                          )}
-                        </div>
-                      </button>
-                      <Link
-                        className="chevron-right-wrapper"
-                        to={`/webAccessibleResources/quickaccess/resources/view/${resource.id}`}
-                      >
-                        <CaretRightSVG />
-                      </Link>
-                    </li>
-                  ))}
-              </ul>
-            </div>
-          )}
-          {showBrowsedResourcesSection && (
-            <div className="list-section">
-              <div className="list-title">
-                <h2>
-                  <Trans>Browse</Trans>
-                </h2>
-              </div>
-              <ul className="list-items">
-                <React.Fragment>
-                  {!isReady && (
-                    <li className="empty-entry">
-                      <SpinnerSVG />
-                      <p className="processing-text">
-                        <Trans>Retrieving your passwords</Trans>
-                      </p>
-                    </li>
-                  )}
-                  {isReady && browsedResources.length === 0 && (
-                    <li className="empty-entry">
-                      <p>
-                        <Trans>No result match your search. Try with another search term.</Trans>
-                      </p>
-                    </li>
-                  )}
-                  {isReady &&
-                    browsedResources.length > 0 &&
-                    browsedResources.map((resource) => (
-                      <li className="browse-resource-entry" key={resource.id}>
-                        <Link to={`/webAccessibleResources/quickaccess/resources/view/${resource.id}`}>
-                          <div className="inline-resource-entry">
-                            <div className="inline-resource-name">
-                              <span className="title">{resource.metadata.name}</span>
-                              <span className="username">
-                                {resource.metadata.username ? ` (${resource.metadata.username})` : ""}
-                              </span>
-                            </div>
-                            <div className="uris">
-                              <span className="url">{resource.metadata.uris?.[0]}</span>
-                              {resource.metadata.uris?.length > 1 && (
-                                <DisplayResourceUrisBadge additionalUris={resource.metadata.uris?.slice(1)} />
-                              )}
-                            </div>
-                          </div>
-                          <CaretRightSVG />
-                        </Link>
-                      </li>
-                    ))}
-                </React.Fragment>
-              </ul>
-            </div>
-          )}
-          {showFiltersSection && (
-            <div className="list-section">
-              <div className="list-title">
-                <h2>
-                  <Trans>Browse</Trans>
-                </h2>
-              </div>
-              <ul className="list-items">
-                <li className="filter-entry">
-                  <Link to={"/webAccessibleResources/quickaccess/more-filters"}>
-                    <FilterSVG />
-                    <span className="filter-title">
-                      <Trans>Filters</Trans>
-                    </span>
-                    <CaretRightSVG />
-                  </Link>
-                </li>
-                {isSessionOnline && (
-                  <li className="filter-entry">
-                    <Link to={"/webAccessibleResources/quickaccess/resources/group"}>
-                      <UsersSVG />
-                      <span className="filter-title">
-                        <Trans>Groups</Trans>
-                      </span>
-                      <CaretRightSVG />
-                    </Link>
-                  </li>
-                )}
-                {canUseTag && (
-                  <li className="filter-entry">
-                    <Link to={"/webAccessibleResources/quickaccess/resources/tag"}>
-                      <TagV2SVG />
-                      <span className="filter-title">
-                        <Trans>Tags</Trans>
-                      </span>
-                      <CaretRightSVG />
-                    </Link>
-                  </li>
-                )}
-              </ul>
-            </div>
-          )}
+      <div className="vault-home">
+        <div className="vault-list">
+          {!isReady && this.renderLoading()}
+          {isReady && this.renderSections(this.resourcesSupportedByQuickAccess)}
         </div>
-        {this.hasMetadataTypesSettings() && this.canCreatePassword() && (
-          <div className="submit-wrapper button-after-list input">
-            <Link
-              to={`/webAccessibleResources/quickaccess/resources/${this.shouldDisplayActionAbortedMissingMetadataKeys ? "action-aborted-missing-metadata-keys" : "create"}`}
-              id="popupAction"
-              className="button primary big full-width"
-              role="button"
-            >
-              <Trans>Create new</Trans>
-            </Link>
-            {this.state.useOnThisTabError && <div className="error-message">{this.state.useOnThisTabError}</div>}
-          </div>
-        )}
+        {this.state.useOnThisTabError && <div className="vault-error">{this.state.useOnThisTabError}</div>}
+        {this.renderFooter()}
       </div>
     );
   }
@@ -436,7 +456,6 @@ class HomePage extends React.Component {
 
 HomePage.propTypes = {
   context: PropTypes.any, // The application context
-  rbacContext: PropTypes.any, // The role based access control context
   resources: PropTypes.array, // The resources from the local storage
   resourceTypes: PropTypes.instanceOf(ResourceTypesCollection), // The resource types collection
   resourcesLocalStorageContext: PropTypes.object, // The resources local storage context
@@ -448,13 +467,11 @@ HomePage.propTypes = {
 
 export default withActiveSessionLocalStorage(
   withAppContext(
-    withRbac(
-      withRouter(
-        withResourceTypesLocalStorage(
-          withResourcesLocalStorage(
-            withMetadataTypesSettingsLocalStorage(
-              withMetadataKeysSettingsLocalStorage(withTranslation("common")(HomePage)),
-            ),
+    withRouter(
+      withResourceTypesLocalStorage(
+        withResourcesLocalStorage(
+          withMetadataTypesSettingsLocalStorage(
+            withMetadataKeysSettingsLocalStorage(withTranslation("common")(HomePage)),
           ),
         ),
       ),

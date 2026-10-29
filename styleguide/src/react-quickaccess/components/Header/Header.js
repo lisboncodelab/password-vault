@@ -2,8 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import { Trans, withTranslation } from "react-i18next";
 import { withAppContext } from "../../../shared/context/AppContext/AppContext";
-import LogoSVG from "../../../img/svg/logo.svg";
-import PowerSVG from "../../../img/svg/power.svg";
+import { LockIcon, SMILEY_URL } from "../Vault/VaultIcons";
 import { withActiveSessionLocalStorage } from "../../../shared/context/ActiveSession/ActiveSessionLocalStorageContext";
 import { withRouter } from "react-router-dom";
 import UserActiveSessionEntity from "../../../shared/models/entity/session/userActiveSessionEntity";
@@ -60,34 +59,46 @@ class Header extends React.Component {
       : this.handleOfflineLogoutClick;
   }
 
+  /**
+   * The initials of the signed in user, for the avatar.
+   * @returns {string} Up to two letters, or an empty string when the profile is unknown
+   */
+  get initials() {
+    const profile = this.props.context.loggedInUser?.profile;
+    const letters = [profile?.first_name, profile?.last_name].map((name) => (name || "").trim().charAt(0));
+    return letters.join("").toUpperCase();
+  }
+
   render() {
+    const isAuthenticated = this.props.activeSession?.isAuthenticated;
     return (
-      <div className="quickaccess-header">
-        <div className="logo-svg">
-          <a
-            href={this.props.context.userSettings ? this.props.context.userSettings.getTrustedDomain() : "#"}
-            target="_blank"
-            rel="noopener noreferrer"
-            title={this.translate("open passbolt in a new tab")}
-          >
-            <LogoSVG role="img" width="10rem" height="1.8rem" />
-          </a>
-        </div>
-        {this.props.activeSession?.isAuthenticated && (
-          <span>
-            <a
-              role="button"
-              className={`option-link button button-transparent`}
-              onClick={this.logoutHandler}
-              title={this.translate("sign out")}
-            >
-              <span className="visually-hidden">
-                <Trans>sign out</Trans>
-              </span>
-              <PowerSVG />
-            </a>
+      <div className="quickaccess-header vault-head">
+        <a
+          className="vault-head-brand"
+          href={this.props.context.userSettings ? this.props.context.userSettings.getTrustedDomain() : "#"}
+          target="_blank"
+          rel="noopener noreferrer"
+          title={this.translate("Open the vault in a new tab")}
+        >
+          <img className="vault-smiley" src={SMILEY_URL} alt="" />
+          <span className="vault-head-title">
+            <Trans>Password Vault</Trans>
           </span>
+        </a>
+        {isAuthenticated && (
+          <button
+            type="button"
+            className="vault-icon-button"
+            onClick={this.logoutHandler}
+            title={this.translate("Lock the vault")}
+          >
+            <span className="visually-hidden">
+              <Trans>sign out</Trans>
+            </span>
+            <LockIcon />
+          </button>
         )}
+        {isAuthenticated && this.initials && <span className="vault-avatar">{this.initials}</span>}
       </div>
     );
   }

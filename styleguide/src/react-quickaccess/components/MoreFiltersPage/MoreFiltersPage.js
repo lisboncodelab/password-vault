@@ -17,6 +17,10 @@ import FavoriteSVG from "../../../img/svg/favorite.svg";
 import OwnedByMeSVG from "../../../img/svg/owned_by_me.svg";
 import ClockSVG from "../../../img/svg/clock.svg";
 import ShareSVG from "../../../img/svg/share.svg";
+import UsersSVG from "../../../img/svg/users.svg";
+import TagV2SVG from "../../../img/svg/tag_v2.svg";
+import { withRbac } from "../../../shared/context/Rbac/RbacContext";
+import { uiActions } from "../../../shared/services/rbacs/uiActionEnumeration";
 import { withAppContext } from "../../../shared/context/AppContext/AppContext";
 import { withMetadataKeysSettingsLocalStorage } from "../../../shared/context/MetadataKeysSettingsLocalStorageContext/MetadataKeysSettingsLocalStorageContext";
 import MetadataKeysSettingsEntity from "../../../shared/models/entity/metadata/metadataKeysSettingsEntity";
@@ -44,6 +48,16 @@ class MoreFiltersPage extends React.Component {
   handleGoBackClick(ev) {
     ev.preventDefault();
     this.props.history.goBack();
+  }
+
+  /**
+   * Whether the tags filter can be offered
+   * @returns {boolean}
+   */
+  get canUseTags() {
+    return (
+      this.props.context.siteSettings.canIUse("tags") && this.props.rbacContext.canIUseAction(uiActions.TAGS_USE)
+    );
   }
 
   /**
@@ -151,6 +165,28 @@ class MoreFiltersPage extends React.Component {
                 <CaretRightSVG />
               </Link>
             </li>
+            {this.props.activeSession?.isSessionOnline && (
+              <li className="filter-entry">
+                <Link to={"/webAccessibleResources/quickaccess/resources/group"}>
+                  <UsersSVG />
+                  <span className="filter-title">
+                    <Trans>Groups</Trans>
+                  </span>
+                  <CaretRightSVG />
+                </Link>
+              </li>
+            )}
+            {this.canUseTags && (
+              <li className="filter-entry">
+                <Link to={"/webAccessibleResources/quickaccess/resources/tag"}>
+                  <TagV2SVG />
+                  <span className="filter-title">
+                    <Trans>Tags</Trans>
+                  </span>
+                  <CaretRightSVG />
+                </Link>
+              </li>
+            )}
           </ul>
         </div>
         {this.hasMetadataTypesSettings() && this.canCreatePassword() && (
@@ -172,6 +208,7 @@ class MoreFiltersPage extends React.Component {
 
 MoreFiltersPage.propTypes = {
   context: PropTypes.any, // The application context
+  rbacContext: PropTypes.any, // The role based access control context
   history: PropTypes.object,
   resourceTypes: PropTypes.instanceOf(ResourceTypesCollection), // The resource types collection
   metadataTypeSettings: PropTypes.instanceOf(MetadataTypesSettingsEntity), // The metadata type settings
@@ -183,9 +220,11 @@ MoreFiltersPage.propTypes = {
 export default withActiveSessionLocalStorage(
   withRouter(
     withAppContext(
-      withResourceTypesLocalStorage(
-        withMetadataTypesSettingsLocalStorage(
-          withMetadataKeysSettingsLocalStorage(withTranslation("common")(MoreFiltersPage)),
+      withRbac(
+        withResourceTypesLocalStorage(
+          withMetadataTypesSettingsLocalStorage(
+            withMetadataKeysSettingsLocalStorage(withTranslation("common")(MoreFiltersPage)),
+          ),
         ),
       ),
     ),
