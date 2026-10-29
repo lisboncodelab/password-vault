@@ -40,7 +40,7 @@ class DisplayInFormMenuItem extends React.Component {
    * @returns {string}
    */
   getClassName() {
-    let name = "in-form-menu-item";
+    let name = `in-form-menu-item is-${this.props.variant}`;
     if (this.props.disabled) {
       name += " disabled";
     }
@@ -102,9 +102,11 @@ class DisplayInFormMenuItem extends React.Component {
 
 DisplayInFormMenuItem.defaultProps = {
   disabled: false,
+  variant: "action",
 };
 
 DisplayInFormMenuItem.propTypes = {
+  variant: PropTypes.oneOf(["resource", "action"]), // A login of the vault or an action
   title: PropTypes.string,
   subtitle: PropTypes.any,
   description: PropTypes.string,

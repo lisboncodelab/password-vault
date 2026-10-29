@@ -17,6 +17,8 @@ import PropTypes from "prop-types";
 import { withRouter } from "react-router-dom";
 import { Trans, withTranslation } from "react-i18next";
 import SpinnerSVG from "../../../img/svg/spinner.svg";
+import { CloseIcon, SMILEY_URL } from "../Vault/VaultIcons";
+import { addNeverSaveSite } from "../../lib/neverSaveSites";
 import Password from "../../../shared/components/Password/Password";
 import { withAppContext } from "../../../shared/context/AppContext/AppContext";
 import { withPasswordPolicies } from "../../../shared/context/PasswordPoliciesContext/PasswordPoliciesContext";
@@ -73,6 +75,7 @@ class SaveResource extends React.Component {
    */
   initEventHandlers() {
     this.handleClose = this.handleClose.bind(this);
+    this.handleNeverForThisSite = this.handleNeverForThisSite.bind(this);
     this.handleFormSubmit = this.handleFormSubmit.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
   }
@@ -212,6 +215,15 @@ class SaveResource extends React.Component {
    * Get the translate function
    * @returns {function(...[*]=)}
    */
+  /**
+   * Remembers never to offer saving a login on this site, then closes the window.
+   * @returns {Promise<void>}
+   */
+  async handleNeverForThisSite() {
+    await addNeverSaveSite(this.props.context.storage, this.state.resourceViewModel?.uri);
+    await this.handleClose();
+  }
+
   get translate() {
     return this.props.t;
   }
@@ -222,10 +234,16 @@ class SaveResource extends React.Component {
    */
   render() {
     return (
-      <div className="resource-auto-save">
-        <h1 className="title">
-          <Trans>Would you like to save this credential ?</Trans>
-        </h1>
+      <div className="resource-auto-save vault-save">
+        <div className="vault-save-head">
+          <img className="vault-smiley" src={SMILEY_URL} alt="" />
+          <h1 className="vault-save-title">
+            <Trans>Save this login?</Trans>
+          </h1>
+          <button type="button" className="vault-icon-button" onClick={this.handleClose} title={this.translate("Close")}>
+            <CloseIcon />
+          </button>
+        </div>
         <form onSubmit={this.handleFormSubmit}>
           <div className="resource-auto-save-form">
             <div className="form-container">
@@ -251,30 +269,6 @@ class SaveResource extends React.Component {
                 )}
                 {this.state.errors?.hasError("name", "api-validation") && (
                   <div className="error-message">{this.state.errors.getError("name", "api-validation")}</div>
-                )}
-              </div>
-              <div className={`input text ${this.state.errors?.hasError("uri") ? "error" : ""}`}>
-                <label htmlFor="uri">
-                  <Trans>URL</Trans>
-                </label>
-                <input
-                  name="uri"
-                  value={this.state.resourceViewModel?.uri || ""}
-                  onChange={this.handleInputChange}
-                  disabled={this.state.processing}
-                  className="fluid"
-                  maxLength="1024"
-                  type="text"
-                  id="uri"
-                  autoComplete="off"
-                />
-                {this.state.errors?.hasError("uri", "maxLength") && (
-                  <div className="error-message">
-                    <Trans>The URI cannot exceed 1024 characters.</Trans>
-                  </div>
-                )}
-                {this.state.errors?.hasError("uri", "api-validation") && (
-                  <div className="error-message">{this.state.errors.getError("uri", "api-validation")}</div>
                 )}
               </div>
               <div className={`input text ${this.state.errors?.hasError("username") ? "error" : ""}`}>
@@ -323,19 +317,26 @@ class SaveResource extends React.Component {
                   <div className="error-message">{this.state.errors.getError("password", "api-validation")}</div>
                 )}
               </div>
+              {this.state.errors?.hasError("uri") && (
+                <div className="error-message">
+                  <Trans>The address of this site cannot be saved.</Trans>
+                </div>
+              )}
               {this.state.unexpectedErrorMessage && (
                 <div className="error-message">{this.state.unexpectedErrorMessage}</div>
               )}
             </div>
           </div>
-          <div className="submit-wrapper input flex-row-end">
-            <a className="cancel" role="button" onClick={this.handleClose}>
-              {this.translate("no, thanks")}
+          <div className="vault-save-actions">
+            <a className="vault-save-never" role="button" onClick={this.handleNeverForThisSite}>
+              <Trans>Never for this site</Trans>
             </a>
+            <button type="button" className="vault-button-ghost" onClick={this.handleClose}>
+              <Trans>Not now</Trans>
+            </button>
             <button
               type="submit"
-              className={`button primary big ${this.state.processing ? "processing" : ""}`}
-              role="button"
+              className={`vault-button-primary ${this.state.processing ? "processing" : ""}`}
               disabled={this.state.processing}
             >
               <Trans>Save</Trans>

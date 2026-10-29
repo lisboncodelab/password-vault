@@ -27,10 +27,8 @@ import {
   RESOURCE_TYPE_PASSWORD_AND_DESCRIPTION_SLUG,
   RESOURCE_TYPE_V5_DEFAULT_SLUG,
 } from "../../../shared/models/entity/resourceType/resourceTypeSchemasDefinition";
-import DiceSVG from "../../../img/svg/dice.svg";
-import AddSVG from "../../../img/svg/add.svg";
-import SearchSVG from "../../../img/svg/search.svg";
-import ResourceIcon from "../../../shared/components/Icons/ResourceIcon";
+import { ExternalIcon, KeyIcon, PlusIcon, SMILEY_URL } from "../../../react-quickaccess/components/Vault/VaultIcons";
+import { tileColor, tileLetter } from "../../../react-quickaccess/lib/vaultTile";
 import { withMetadataKeysSettingsLocalStorage } from "../../../shared/context/MetadataKeysSettingsLocalStorageContext/MetadataKeysSettingsLocalStorageContext";
 import MetadataKeysSettingsEntity from "../../../shared/models/entity/metadata/metadataKeysSettingsEntity";
 import Logger from "../../../shared/utils/logger";
@@ -274,12 +272,11 @@ class DisplayInFormMenu extends React.Component {
       <DisplayInFormMenuItem
         key="generate-password"
         onClick={this.handleGeneratePasswordRequestedEvent}
-        title={this.props.t("Generate a new password securely")}
+        title={this.props.t("Generate a strong password")}
         subtitle={
           <span className="in-form-menu-item-content-subheader-password">{this.truncatedGeneratedPassword}</span>
         }
-        description={this.props.t("You will be able to save it after submitting")}
-        icon={<DiceSVG />}
+        icon={<KeyIcon />}
         disabled={disabled}
       />
     );
@@ -294,9 +291,8 @@ class DisplayInFormMenu extends React.Component {
       <DisplayInFormMenuItem
         key="save-credentials"
         onClick={this.handleSaveCredentialsRequestedEvent}
-        title={this.props.t("Save as new credential")}
-        description={this.props.t("Save the data entered as a new credential")}
-        icon={<AddSVG />}
+        title={this.props.t("Save as a new login")}
+        icon={<PlusIcon />}
       />
     );
   }
@@ -310,9 +306,8 @@ class DisplayInFormMenu extends React.Component {
       <DisplayInFormMenuItem
         key="create-new-credentials"
         onClick={this.handleCreateNewCredentialsRequestedEvent}
-        title={this.props.t("Create a new credential")}
-        description={this.props.t("Create and customize it yourself")}
-        icon={<AddSVG />}
+        title={this.props.t("Create a new login")}
+        icon={<PlusIcon />}
       />
     );
   }
@@ -326,9 +321,8 @@ class DisplayInFormMenu extends React.Component {
       <DisplayInFormMenuItem
         key="browse-credentials"
         onClick={this.handleBrowseCredentialsRequestedEvent}
-        title={this.props.t("Browse credentials")}
-        description={this.props.t("Search among available credentials")}
-        icon={<SearchSVG />}
+        title={this.props.t("Open the vault")}
+        icon={<ExternalIcon />}
       />
     );
   }
@@ -346,9 +340,14 @@ class DisplayInFormMenu extends React.Component {
             onClick={() => this.handleUseSuggestedResourceRequestedEvent(resource.id)}
             processing={this.state.resourceIdProcessing === resource.id}
             disabled={this.state.resourceIdProcessing === resource.id}
+            variant="resource"
             title={resource.metadata.name}
             description={resource.metadata?.username}
-            icon={<ResourceIcon resource={resource} />}
+            icon={
+              <span className="vault-tile" style={{ background: tileColor(resource.metadata.name) }}>
+                {tileLetter(resource.metadata.name)}
+              </span>
+            }
             showTimer={this.isOTPConfiguration}
           />,
         ]),
@@ -495,6 +494,10 @@ class DisplayInFormMenu extends React.Component {
     const items = this.items;
     return (
       <div className={`in-form-menu ${items.length > 3 && "in-form-menu--scrollable"}`} ref={this.inFormMenuRef}>
+        <div className="vault-menu-head">
+          <img className="vault-smiley" src={SMILEY_URL} alt="" />
+          {this.props.t("Password Vault")}
+        </div>
         {items}
       </div>
     );
