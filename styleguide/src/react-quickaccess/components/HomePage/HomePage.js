@@ -39,7 +39,7 @@ import ClipboardServiceWorkerService from "../../../shared/services/serviceWorke
 import SecretServiceWorkerService from "../../../shared/services/serviceWorker/secret/secretServiceWorkerService";
 import VaultResourceRow from "./VaultResourceRow";
 import { KeyIcon, PlusIcon, SlidersIcon } from "../Vault/VaultIcons";
-import { hostOf } from "../../lib/vaultTile";
+import { hostOf } from "../../lib/urlHost";
 
 const SUGGESTED_RESOURCES_LIMIT = 20;
 const BROWSED_RESOURCES_LIMIT = 100;

@@ -28,7 +28,7 @@ import {
   RESOURCE_TYPE_V5_DEFAULT_SLUG,
 } from "../../../shared/models/entity/resourceType/resourceTypeSchemasDefinition";
 import { ExternalIcon, KeyIcon, PlusIcon, SMILEY_URL } from "../../../react-quickaccess/components/Vault/VaultIcons";
-import { tileColor, tileLetter } from "../../../react-quickaccess/lib/vaultTile";
+import ResourceIcon from "../../../shared/components/Icons/ResourceIcon";
 import { withMetadataKeysSettingsLocalStorage } from "../../../shared/context/MetadataKeysSettingsLocalStorageContext/MetadataKeysSettingsLocalStorageContext";
 import MetadataKeysSettingsEntity from "../../../shared/models/entity/metadata/metadataKeysSettingsEntity";
 import Logger from "../../../shared/utils/logger";
@@ -343,11 +343,7 @@ class DisplayInFormMenu extends React.Component {
             variant="resource"
             title={resource.metadata.name}
             description={resource.metadata?.username}
-            icon={
-              <span className="vault-tile" style={{ background: tileColor(resource.metadata.name) }}>
-                {tileLetter(resource.metadata.name)}
-              </span>
-            }
+            icon={<ResourceIcon resource={resource} />}
             showTimer={this.isOTPConfiguration}
           />,
         ]),

@@ -80,7 +80,13 @@ class Search extends React.Component {
           value={this.props.context.search}
         />
         {this.props.context.search ? (
-          <button type="button" className="vault-icon-button" name="clear-button" onClick={this.clearSearchInput}>
+          <button
+            type="button"
+            className="vault-icon-button"
+            name="clear-button"
+            onClick={this.clearSearchInput}
+            title={this.translate("Clear the search")}
+          >
             <CloseIcon />
             <span className="visually-hidden">
               <Trans>Clear</Trans>

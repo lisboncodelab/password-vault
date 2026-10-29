@@ -10,7 +10,7 @@
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
  */
 
-import { hostOf } from "./vaultTile";
+import { hostOf } from "./urlHost";
 
 export const NEVER_SAVE_SITES_STORAGE_KEY = "lisboncodelab_never_save_hosts";
 

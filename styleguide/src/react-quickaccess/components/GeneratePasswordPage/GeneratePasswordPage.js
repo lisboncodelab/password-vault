@@ -247,7 +247,11 @@ class GeneratePasswordPage extends React.Component {
                   onChange={this.handleInputChange}
                   disabled={this.state.processing}
                 />
-                <a onClick={this.handleGeneratePasswordButtonClick} className="password-generate button button-icon">
+                <a
+                  onClick={this.handleGeneratePasswordButtonClick}
+                  className="password-generate button button-icon"
+                  title={this.translate("Generate a password")}
+                >
                   <DiceSVG />
                   <span className="visually-hidden">
                     <Trans>Generate</Trans>

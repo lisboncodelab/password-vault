@@ -681,6 +681,7 @@ class ResourceCreatePage extends React.Component {
                     type="button"
                     onClick={this.handleGeneratePasswordButtonClick}
                     className={`password-generate button-icon button ${this.state.processing ? "disabled" : ""}`}
+                    title={this.translate("Generate a password")}
                   >
                     <DiceSVG />
                     <span className="visually-hidden">
@@ -692,6 +693,7 @@ class ResourceCreatePage extends React.Component {
                       type="button"
                       onClick={this.handleOpenGenerator}
                       className="password-generator button-icon button"
+                      title={this.translate("Password generator settings")}
                     >
                       <SettingsSVG />
                       <span className="visually-hidden">
