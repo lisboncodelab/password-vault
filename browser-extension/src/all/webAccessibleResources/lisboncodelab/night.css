@@ -42,6 +42,15 @@
     --Palette-Select-highlight-1: #2f2e1c;
     --Palette-Select-highlight-2: #26251a;
     --Primary-button-Primary-button-text: #1b1b1d;
+    --Quick-Access-Primary-button-text: #1b1b1d;
+    --Quick-Access-Header-and-footer-background: #1b1b1d;
+    --Quick-Access-Panel-background: #1b1b1d;
+    --Quick-Access-Filter-hover: #29292c;
+    --Spinner-Button-spinner-foreground: #1b1b1d;
+    --Field-Field-background: #232326;
+    --Field-Field-border: #3a3a3d;
+    --Field-Field-border-focus: #6f6e69;
+    --States-Focus: #6f6e69;
 }
 
 html body,

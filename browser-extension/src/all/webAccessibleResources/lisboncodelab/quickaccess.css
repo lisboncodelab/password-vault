@@ -6,7 +6,9 @@
  * For full copyright and license information, please see the LICENSE.txt
  * Redistributions of files must retain the above copyright notice.
  *
- * The popup in the Night look: the header, search, list and footer of the vault.
+ * The popup in the Night look: the header, search, list, footer and save card.
+ * Every rule is scoped under .quickaccess, states included, so the theme's
+ * element and state rules cannot override it.
  *
  * @copyright     Copyright (c) 2026 Lisbon Code Lab
  * @license       https://opensource.org/licenses/AGPL-3.0 AGPL License
@@ -15,53 +17,75 @@
 @import url("night.css");
 
 html body {
-    width: 360px;
+    width: 380px;
     background: var(--vault-ink);
     color: var(--vault-text);
 }
 
-.vault-icon-button {
+/* Icon buttons, as buttons and as links -------------------------------------- */
+
+html body .quickaccess .vault-icon-button,
+html body .quickaccess .vault-icon-button:link,
+html body .quickaccess .vault-icon-button:visited,
+html body .quickaccess .vault-icon-button:focus,
+html body .quickaccess .vault-icon-button:active {
     display: grid;
     flex: none;
     place-items: center;
     width: 30px;
+    min-width: 0;
     height: 30px;
+    margin: 0;
     padding: 0;
     border: 0;
     border-radius: 8px;
     background: transparent;
+    box-shadow: none;
     color: var(--vault-muted);
     cursor: pointer;
 }
 
-.vault-icon-button:hover,
-.vault-icon-button:focus-visible { background: var(--vault-hover); color: var(--vault-text); outline: none; }
-.vault-icon-button.is-copied { color: var(--vault-yellow); }
+html body .quickaccess .vault-icon-button:hover,
+html body .quickaccess .vault-icon-button:focus-visible {
+    background: var(--vault-hover);
+    box-shadow: none;
+    color: var(--vault-text);
+    outline: none;
+}
+
+html body .quickaccess .vault-icon-button.is-copied { color: var(--vault-yellow); }
+html body .quickaccess .vault-icon-button::after { display: none; }
 
 /* The header ---------------------------------------------------------------- */
 
-html body .quickaccess-header.vault-head {
+html body .quickaccess .quickaccess-header.vault-head {
     display: flex;
     align-items: center;
     gap: 6px;
     height: auto;
+    margin: 0;
     padding: 14px 16px 12px;
     border: 0;
     background: var(--vault-ink);
 }
 
-.vault-head-brand {
+html body .quickaccess .vault-head-brand,
+html body .quickaccess .vault-head-brand:link,
+html body .quickaccess .vault-head-brand:visited,
+html body .quickaccess .vault-head-brand:hover {
     display: flex;
     flex: 1;
     align-items: center;
     gap: 9px;
     color: var(--vault-text);
+    font-size: 15px;
     text-decoration: none;
 }
 
-.vault-head-title { font-size: 15px; font-weight: 600; }
+html body .quickaccess .vault-head-brand::after { display: none; }
+html body .quickaccess .vault-head-title { font-size: 15px; font-weight: 600; }
 
-.vault-avatar {
+html body .quickaccess .vault-avatar {
     display: grid;
     place-items: center;
     width: 28px;
@@ -74,9 +98,11 @@ html body .quickaccess-header.vault-head {
     font-weight: 700;
 }
 
+html body .quickaccess:has(.vault-save) .quickaccess-header.vault-head { display: none; }
+
 /* The search ---------------------------------------------------------------- */
 
-.vault-search {
+html body .quickaccess .vault-search {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -89,25 +115,33 @@ html body .quickaccess-header.vault-head {
     color: var(--vault-muted);
 }
 
-.vault-search:focus-within { border-color: #57564f; }
+html body .quickaccess .vault-search:focus-within { border-color: #57564f; }
 
-html body .vault-search input {
+html body .quickaccess .vault-search input[type="search"],
+html body .quickaccess .vault-search input[type="search"]:hover,
+html body .quickaccess .vault-search input[type="search"]:focus,
+html body .quickaccess .vault-search input[type="search"]:focus-visible,
+html body .quickaccess .vault-search input[type="search"]:active {
     flex: 1;
+    width: auto;
     min-width: 0;
     height: 100%;
+    margin: 0;
     padding: 0;
     border: 0;
+    border-radius: 0;
     background: transparent;
+    box-shadow: none;
     color: var(--vault-text);
     font-size: 13px;
+    line-height: normal;
     outline: none;
-    box-shadow: none;
 }
 
-.vault-search input::placeholder { color: var(--vault-muted); }
-.vault-search input::-webkit-search-cancel-button { display: none; }
+html body .quickaccess .vault-search input[type="search"]::placeholder { color: var(--vault-muted); }
+html body .quickaccess .vault-search input[type="search"]::-webkit-search-cancel-button { display: none; }
 
-.vault-search kbd {
+html body .quickaccess .vault-search kbd {
     margin-right: 6px;
     padding: 1px 6px;
     border-radius: 5px;
@@ -118,10 +152,10 @@ html body .vault-search input {
 
 /* The list ------------------------------------------------------------------ */
 
-.vault-home { display: flex; flex-direction: column; height: 482px; }
-.vault-list { flex: 1; overflow-y: auto; padding: 4px 8px; }
+html body .quickaccess .vault-home { display: flex; flex-direction: column; height: 482px; }
+html body .quickaccess .vault-list { flex: 1; overflow-y: auto; padding: 4px 8px; }
 
-.vault-section-label {
+html body .quickaccess h2.vault-section-label {
     display: flex;
     align-items: center;
     gap: 6px;
@@ -130,36 +164,56 @@ html body .vault-search input {
     color: var(--vault-muted);
     font-size: 11px;
     font-weight: 600;
+    line-height: 1.4;
     letter-spacing: 0.04em;
     text-transform: uppercase;
 }
 
-.vault-section-count { margin-left: auto; font-weight: 500; letter-spacing: 0; text-transform: none; }
-.vault-site-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--vault-yellow); }
-.vault-empty { margin: 0; padding: 6px 8px 10px; color: var(--vault-muted); font-size: 12px; }
+html body .quickaccess .vault-section-count {
+    overflow: hidden;
+    margin-left: auto;
+    font-weight: 500;
+    letter-spacing: 0;
+    text-overflow: ellipsis;
+    text-transform: none;
+    white-space: nowrap;
+}
 
-.vault-items { margin: 0; padding: 0; list-style: none; }
+html body .quickaccess .vault-site-dot { width: 7px; height: 7px; flex: none; border-radius: 50%; background: var(--vault-yellow); }
+html body .quickaccess .vault-empty { margin: 0; padding: 6px 8px 10px; color: var(--vault-muted); font-size: 12px; }
 
-.vault-item { display: flex; align-items: center; gap: 4px; padding: 0 4px 0 0; border-radius: 9px; }
-.vault-item:hover,
-.vault-item:focus-within { background: var(--vault-hover); }
+html body .quickaccess .vault-items { margin: 0; padding: 0; list-style: none; }
 
-.vault-item-main {
+html body .quickaccess .vault-item { display: flex; align-items: center; gap: 4px; padding: 0 4px 0 0; border-radius: 9px; }
+html body .quickaccess .vault-item:hover,
+html body .quickaccess .vault-item:focus-within { background: var(--vault-hover); }
+
+html body .quickaccess .vault-item-main,
+html body .quickaccess .vault-item-main:link,
+html body .quickaccess .vault-item-main:visited,
+html body .quickaccess .vault-item-main:hover,
+html body .quickaccess .vault-item-main:focus {
     display: flex;
     flex: 1;
     align-items: center;
     gap: 10px;
     min-width: 0;
     padding: 7px 8px;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
     color: var(--vault-text);
+    font-size: 13px;
     text-decoration: none;
 }
 
-.vault-item-text { display: flex; flex: 1; flex-direction: column; min-width: 0; }
-.vault-item-name { overflow: hidden; font-size: 13px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
-.vault-item-detail { overflow: hidden; color: var(--vault-muted); font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+html body .quickaccess .vault-item-main::after { display: none; }
 
-.vault-badge {
+html body .quickaccess .vault-item-text { display: flex; flex: 1; flex-direction: column; min-width: 0; }
+html body .quickaccess .vault-item-name { overflow: hidden; font-size: 13px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+html body .quickaccess .vault-item-detail { overflow: hidden; color: var(--vault-muted); font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+
+html body .quickaccess .vault-badge {
     display: inline-flex;
     align-items: center;
     gap: 3px;
@@ -173,16 +227,16 @@ html body .vault-search input {
     vertical-align: 1px;
 }
 
-.vault-item-actions { display: none; gap: 2px; }
-.vault-item:hover .vault-item-actions,
-.vault-item:focus-within .vault-item-actions { display: flex; }
+html body .quickaccess .vault-item-actions { display: none; gap: 2px; }
+html body .quickaccess .vault-item:hover .vault-item-actions,
+html body .quickaccess .vault-item:focus-within .vault-item-actions { display: flex; }
 
-.vault-loading { display: grid; justify-items: center; gap: 8px; padding: 40px 0; color: var(--vault-muted); font-size: 12px; }
-.vault-error { margin: 0 16px 8px; color: #ff8a80; font-size: 12px; }
+html body .quickaccess .vault-loading { display: grid; justify-items: center; gap: 8px; padding: 40px 0; color: var(--vault-muted); font-size: 12px; }
+html body .quickaccess .vault-error { margin: 0 16px 8px; color: #ff8a80; font-size: 12px; }
 
-/* The footer ---------------------------------------------------------------- */
+/* The footer and the yellow button ------------------------------------------ */
 
-.vault-foot {
+html body .quickaccess .vault-foot {
     display: flex;
     align-items: center;
     gap: 6px;
@@ -190,38 +244,64 @@ html body .vault-search input {
     border-top: 1px solid #2c2c2f;
 }
 
-.vault-button-primary {
+html body .quickaccess .vault-button-primary,
+html body .quickaccess .vault-button-primary:link,
+html body .quickaccess .vault-button-primary:visited,
+html body .quickaccess .vault-button-primary:focus,
+html body .quickaccess .vault-button-primary:active {
     display: inline-flex;
     flex: 1;
     align-items: center;
     justify-content: center;
     gap: 6px;
     height: 38px;
+    margin: 0;
+    padding: 0 14px;
+    border: 0;
     border-radius: 10px;
     background: var(--vault-yellow);
+    box-shadow: none;
     color: var(--vault-ink);
     font-size: 13px;
     font-weight: 600;
     text-decoration: none;
+    cursor: pointer;
 }
 
-.vault-button-primary:hover { background: #fff27a; color: var(--vault-ink); }
+html body .quickaccess .vault-button-primary:hover,
+html body .quickaccess .vault-button-primary:focus-visible {
+    background: #fff27a;
+    box-shadow: none;
+    color: var(--vault-ink);
+    outline: none;
+}
+
+html body .quickaccess .vault-button-primary::after { display: none; }
+html body .quickaccess .vault-button-primary:disabled { opacity: 0.6; cursor: default; }
+html body .quickaccess .vault-button-primary svg { --spinner-color: var(--vault-ink); }
 
 /* The save card ------------------------------------------------------------- */
 
-body:has(.vault-save) .vault-head { display: none; }
+html body .quickaccess .vault-save { padding: 14px; background: var(--vault-ink); color: var(--vault-text); }
 
-html body .vault-save { padding: 14px; background: var(--vault-ink); color: var(--vault-text); }
+html body .quickaccess .vault-save-head { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
 
-.vault-save-head { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
-html body .vault-save-title { flex: 1; margin: 0; color: var(--vault-text); font-size: 14px; font-weight: 600; }
+html body .quickaccess h1.vault-save-title {
+    flex: 1;
+    margin: 0;
+    padding: 0;
+    color: var(--vault-text);
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.4;
+}
 
-html body .vault-save .resource-auto-save-form,
-html body .vault-save .form-container { padding: 0; border: 0; background: transparent; }
+html body .quickaccess .vault-save .resource-auto-save-form,
+html body .quickaccess .vault-save .form-container { margin: 0; padding: 0; border: 0; background: transparent; }
 
-html body .vault-save .input { margin: 0 0 8px; padding: 0; }
+html body .quickaccess .vault-save .input { margin: 0 0 8px; padding: 0; }
 
-html body .vault-save label {
+html body .quickaccess .vault-save label {
     display: block;
     margin-bottom: 4px;
     color: var(--vault-muted);
@@ -229,25 +309,35 @@ html body .vault-save label {
     font-weight: 600;
 }
 
-html body .vault-save input[type="text"],
-html body .vault-save input[type="password"] {
+html body .quickaccess .vault-save input[type="text"],
+html body .quickaccess .vault-save input[type="text"]:hover,
+html body .quickaccess .vault-save input[type="text"]:focus,
+html body .quickaccess .vault-save input[type="password"],
+html body .quickaccess .vault-save input[type="password"]:hover,
+html body .quickaccess .vault-save input[type="password"]:focus {
     width: 100%;
     height: 34px;
     padding: 0 10px;
     border: 1px solid #3a3a3d;
     border-radius: 8px;
     background: var(--vault-surface);
+    box-shadow: none;
     color: var(--vault-text);
     font-size: 13px;
-    box-shadow: none;
+    outline: none;
 }
 
-html body .vault-save input:focus { border-color: #57564f; outline: none; }
-html body .vault-save .error-message { margin-top: 4px; color: #ff8a80; font-size: 12px; }
+html body .quickaccess .vault-save input[type="text"]:focus,
+html body .quickaccess .vault-save input[type="password"]:focus { border-color: #57564f; }
 
-.vault-save-actions { display: flex; align-items: center; gap: 8px; margin-top: 14px; }
+html body .quickaccess .vault-save .error-message { margin-top: 4px; color: #ff8a80; font-size: 12px; }
 
-.vault-save-never {
+html body .quickaccess .vault-save-actions { display: flex; align-items: center; gap: 8px; margin-top: 14px; }
+html body .quickaccess .vault-save-actions .vault-button-primary { flex: none; height: 34px; border-radius: 8px; }
+
+html body .quickaccess .vault-save-never,
+html body .quickaccess .vault-save-never:link,
+html body .quickaccess .vault-save-never:visited {
     margin-right: auto;
     color: var(--vault-muted);
     font-size: 12px;
@@ -256,23 +346,29 @@ html body .vault-save .error-message { margin-top: 4px; color: #ff8a80; font-siz
     cursor: pointer;
 }
 
-.vault-save-never:hover { color: var(--vault-text); }
+html body .quickaccess .vault-save-never:hover { color: var(--vault-text); }
+html body .quickaccess .vault-save-never::after { display: none; }
 
-.vault-save-actions .vault-button-primary { flex: none; height: 34px; padding: 0 14px; border: 0; border-radius: 8px; cursor: pointer; }
-.vault-save-actions .vault-button-primary:disabled { opacity: 0.6; cursor: default; }
-.vault-save-actions .vault-button-primary svg { width: 14px; height: 14px; }
-
-.vault-button-ghost {
+html body .quickaccess .vault-button-ghost,
+html body .quickaccess .vault-button-ghost:focus,
+html body .quickaccess .vault-button-ghost:active {
     height: 34px;
+    margin: 0;
     padding: 0 14px;
     border: 0;
     border-radius: 8px;
     background: transparent;
+    box-shadow: inset 0 0 0 1px #3a3a3d;
     color: var(--vault-text);
     font-size: 13px;
     font-weight: 600;
-    box-shadow: inset 0 0 0 1px #3a3a3d;
     cursor: pointer;
 }
 
-.vault-button-ghost:hover { background: var(--vault-hover); }
+html body .quickaccess .vault-button-ghost:hover,
+html body .quickaccess .vault-button-ghost:focus-visible {
+    background: var(--vault-hover);
+    box-shadow: inset 0 0 0 1px #3a3a3d;
+    color: var(--vault-text);
+    outline: none;
+}
